@@ -15,16 +15,16 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Request() req: { user: any }) {
+  getProfile(@Request() req: { user: { userId: string; email: string } }) {
     return req.user;
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('push-token')
   async updatePushToken(
-    @Request() req: { user: { id: string } },
+    @Request() req: { user: { userId: string } },
     @Body('pushToken') pushToken: string,
   ) {
-    return this.usersService.updatePushToken(req.user.id, pushToken);
+    return this.usersService.updatePushToken(req.user.userId, pushToken);
   }
 }

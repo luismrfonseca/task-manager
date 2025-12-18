@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 import {
   CreateTaskDTO,
   TaskDTO,
@@ -23,22 +24,23 @@ export class TasksService {
         userId,
       },
     });
+
     return {
       ...task,
       description: task.description ?? undefined,
       priority: task.priority as unknown as Priority,
-    };
+    } as TaskDTO;
   }
 
   async findAll(userId: string, filter?: TaskFilterDTO): Promise<TaskDTO[]> {
     const { search, priority, completed, sortBy, sortOrder } = filter || {};
 
-    const where: any = { userId };
+    const where: Prisma.TaskWhereInput = { userId };
     if (search) {
       where.title = { contains: search, mode: 'insensitive' };
     }
     if (priority) {
-      where.priority = priority;
+      where.priority = priority as unknown as Priority;
     }
     if (completed !== undefined) {
       // Handle string boolean conversion if coming from query params without transformation
@@ -46,9 +48,10 @@ export class TasksService {
       where.completed = isCompleted;
     }
 
-    const orderBy: any = {};
+    const orderBy: Prisma.TaskOrderByWithRelationInput = {};
     if (sortBy) {
-      orderBy[sortBy] = sortOrder || 'desc';
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      (orderBy as any)[sortBy] = sortOrder || 'desc';
     } else {
       orderBy.createdAt = 'desc';
     }
@@ -116,7 +119,8 @@ export class TasksService {
         where: { id: userId },
       });
       // Prisma types might not be updated in IDE context yet, cast to any or check manually
-      const pushToken = (user as any)?.pushToken;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const pushToken = (user as any)?.pushToken as string | undefined;
 
       if (pushToken) {
         await this.notificationsService.sendPushNotification(

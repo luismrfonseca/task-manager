@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { Injectable, Logger } from '@nestjs/common';
 import Expo, { ExpoPushMessage } from 'expo-server-sdk';
 
@@ -6,11 +7,16 @@ export class NotificationsService {
   private expo = new Expo();
   private readonly logger = new Logger(NotificationsService.name);
 
-  async sendPushNotification(pushToken: string, message: string, data?: any) {
+  async sendPushNotification(
+    pushToken: string,
+    message: string,
+    data?: Record<string, unknown>,
+  ): Promise<void> {
     if (!Expo.isExpoPushToken(pushToken)) {
       this.logger.error(
         `Push token ${pushToken} is not a valid Expo push token`,
       );
+
       return;
     }
 
