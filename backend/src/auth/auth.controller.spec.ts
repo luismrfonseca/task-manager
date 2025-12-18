@@ -17,8 +17,8 @@ describe('AuthController', () => {
             refreshTokens: jest.fn(),
             logout: jest.fn(),
           },
-        }
-      ]
+        },
+      ],
     }).compile();
 
     controller = module.get<AuthController>(AuthController);

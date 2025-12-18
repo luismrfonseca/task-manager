@@ -1,14 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateTaskDTO, TaskDTO, Priority, TaskFilterDTO, TaskStatsDTO } from '@shared/index';
+import {
+  CreateTaskDTO,
+  TaskDTO,
+  Priority,
+  TaskFilterDTO,
+  TaskStatsDTO,
+} from '@shared/index';
 import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class TasksService {
   constructor(
     private prisma: PrismaService,
-    private notificationsService: NotificationsService
-  ) { }
+    private notificationsService: NotificationsService,
+  ) {}
 
   async create(createTaskDto: CreateTaskDTO, userId: string): Promise<TaskDTO> {
     const task = await this.prisma.task.create({
@@ -20,7 +26,7 @@ export class TasksService {
     return {
       ...task,
       description: task.description ?? undefined,
-      priority: task.priority as unknown as Priority
+      priority: task.priority as unknown as Priority,
     };
   }
 
@@ -51,16 +57,18 @@ export class TasksService {
       where,
       orderBy,
     });
-    return tasks.map(t => ({
+    return tasks.map((t) => ({
       ...t,
       description: t.description ?? undefined,
-      priority: t.priority as unknown as Priority
+      priority: t.priority as unknown as Priority,
     }));
   }
 
   async getStats(userId: string): Promise<TaskStatsDTO> {
     const totalTasks = await this.prisma.task.count({ where: { userId } });
-    const completedTasks = await this.prisma.task.count({ where: { userId, completed: true } });
+    const completedTasks = await this.prisma.task.count({
+      where: { userId, completed: true },
+    });
 
     const priorityGroups = await this.prisma.task.groupBy({
       by: ['priority'],
@@ -74,7 +82,7 @@ export class TasksService {
       LOW: 0,
     };
 
-    priorityGroups.forEach(group => {
+    priorityGroups.forEach((group) => {
       // Cast group.priority to string/enum key if needed, Prisma generated enums match
       const key = group.priority as unknown as keyof typeof tasksByPriority;
       if (tasksByPriority[key] !== undefined) {
@@ -85,14 +93,14 @@ export class TasksService {
     return {
       totalTasks,
       completedTasks,
-      completionRate: totalTasks > 0 ? (completedTasks / totalTasks) : 0,
+      completionRate: totalTasks > 0 ? completedTasks / totalTasks : 0,
       tasksByPriority,
     };
   }
 
   async findOne(id: string, userId: string) {
     return this.prisma.task.findFirst({
-      where: { id, userId }
+      where: { id, userId },
     });
   }
 
@@ -105,7 +113,7 @@ export class TasksService {
     if (task) {
       // Explicitly select pushToken or cast
       const user = await this.prisma.user.findUnique({
-        where: { id: userId }
+        where: { id: userId },
       });
       // Prisma types might not be updated in IDE context yet, cast to any or check manually
       const pushToken = (user as any)?.pushToken;
@@ -114,16 +122,16 @@ export class TasksService {
         await this.notificationsService.sendPushNotification(
           pushToken,
           `Task Updated: ${task.title}`,
-          { taskId: task.id }
+          { taskId: task.id },
         );
       }
     }
     return { ...task, description: task.description ?? undefined };
   }
 
-  async remove(id: string, userId: string) {
+  async remove(id: string) {
     return this.prisma.task.delete({
-      where: { id }
+      where: { id },
     });
   }
 }

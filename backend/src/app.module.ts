@@ -17,13 +17,18 @@ import { SentryFilter } from './common/filters/sentry.filter';
     ConfigModule.forRoot({ isGlobal: true }),
     LoggerModule.forRoot({
       pinoHttp: {
-        transport: process.env.NODE_ENV !== 'production' ? { target: 'pino-pretty' } : undefined,
+        transport:
+          process.env.NODE_ENV !== 'production'
+            ? { target: 'pino-pretty' }
+            : undefined,
       },
     }),
-    ThrottlerModule.forRoot([{
-      ttl: 60000,
-      limit: 10,
-    }]),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 10,
+      },
+    ]),
     AuthModule,
     PrismaModule,
     UsersModule,
@@ -43,4 +48,4 @@ import { SentryFilter } from './common/filters/sentry.filter';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}

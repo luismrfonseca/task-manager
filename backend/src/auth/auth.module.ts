@@ -9,13 +9,8 @@ import { RefreshTokenStrategy } from './strategies/refresh.strategy';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [
-    ConfigModule,
-    UsersModule,
-    PassportModule,
-    JwtModule.register({}),
-  ],
+  imports: [ConfigModule, UsersModule, PassportModule, JwtModule.register({})],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, RefreshTokenStrategy],
 })
-export class AuthModule { }
+export class AuthModule {}
