@@ -100,8 +100,8 @@ export class AuthService {
   }
 
   async signUp(createUserDto: CreateUserDTO) {
-    this.validatePasswordStrength(createUserDto.password!);
-    const hash = await bcrypt.hash(createUserDto.password!, 10);
+    this.validatePasswordStrength(createUserDto.password);
+    const hash = await bcrypt.hash(createUserDto.password, 10);
     const newUser = await this.usersService.create({
       ...createUserDto,
       password: hash,
