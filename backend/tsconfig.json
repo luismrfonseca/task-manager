@@ -24,6 +24,12 @@
     "paths": {
       "@shared/*": [
         "../shared/*"
+      ],
+      "class-validator": [
+        "./node_modules/class-validator"
+      ],
+      "class-transformer": [
+        "./node_modules/class-transformer"
       ]
     }
   }
